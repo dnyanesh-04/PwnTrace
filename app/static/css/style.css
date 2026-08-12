@@ -1,0 +1,289 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #0b1120;
+    color: #e5e7eb;
+    font-family: Inter, Arial, sans-serif;
+}
+
+.navbar {
+    padding: 20px 40px;
+    background: #111827;
+    border-bottom: 1px solid #263244;
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: 800;
+    color: #67e8f9;
+}
+
+.subtitle {
+    color: #94a3b8;
+    margin-top: 4px;
+}
+
+.container {
+    max-width: 1400px;
+    margin: auto;
+    padding: 32px;
+}
+
+.hero h1 {
+    margin-bottom: 8px;
+}
+
+.hero p {
+    color: #cbd5e1;
+    max-width: 1000px;
+}
+
+.notice {
+    padding: 12px 14px;
+    border-left: 4px solid #f59e0b;
+    background: #1f2937;
+}
+
+.scan-box,
+.card {
+    margin-top: 24px;
+    padding: 22px;
+    background: #111827;
+    border: 1px solid #263244;
+    border-radius: 12px;
+}
+
+.form-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+input {
+    flex: 1;
+    min-width: 0;
+    padding: 13px;
+    color: #e5e7eb;
+    background: #0b1120;
+    border: 1px solid #475569;
+    border-radius: 8px;
+}
+
+button,
+.exports a {
+    padding: 13px 18px;
+    border: 0;
+    border-radius: 8px;
+    background: #22d3ee;
+    color: #082f49;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.progress-container {
+    margin-top: 16px;
+    height: 34px;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #0b1120;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 100%;
+    padding: 8px 12px;
+    background: #164e63;
+    color: #cffafe;
+    animation: pulse 1.4s infinite;
+}
+
+.hidden {
+    display: none;
+}
+
+.alert {
+    margin-top: 18px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    background: #3f1d1d;
+    border: 1px solid #ef4444;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.metric {
+    padding: 18px;
+    background: #111827;
+    border: 1px solid #263244;
+    border-radius: 10px;
+}
+
+.metric span {
+    display: block;
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+.metric strong {
+    display: block;
+    margin-top: 6px;
+    font-size: 25px;
+}
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+}
+
+th,
+td {
+    padding: 10px;
+    border-bottom: 1px solid #263244;
+    text-align: left;
+    vertical-align: top;
+    font-size: 14px;
+}
+
+th {
+    color: #93c5fd;
+}
+
+a {
+    color: #67e8f9;
+}
+
+.severity {
+    display: inline-block;
+    padding: 3px 7px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.critical {
+    background: #7f1d1d;
+    color: #fecaca;
+}
+
+.high {
+    background: #78350f;
+    color: #fed7aa;
+}
+
+.medium {
+    background: #713f12;
+    color: #fef08a;
+}
+
+.low {
+    background: #14532d;
+    color: #bbf7d0;
+}
+
+.muted,
+small {
+    color: #94a3b8;
+}
+
+.intel-row {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #263244;
+}
+
+.mapping,
+.path {
+    padding: 16px;
+    margin-top: 14px;
+    background: #0b1120;
+    border: 1px solid #263244;
+    border-radius: 8px;
+}
+
+.technique {
+    display: grid;
+    gap: 4px;
+    padding: 10px;
+    margin-top: 8px;
+    border-left: 3px solid #22d3ee;
+}
+
+.path-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+}
+
+.path li {
+    margin: 12px 0;
+}
+
+.path li small {
+    display: block;
+    margin-top: 3px;
+}
+
+.assumptions {
+    padding: 12px;
+    color: #94a3b8;
+    font-size: 13px;
+    border-top: 1px solid #263244;
+}
+
+.graph {
+    min-height: 650px;
+}
+
+.exports {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.65; }
+    50% { opacity: 1; }
+}
+
+@media (max-width: 700px) {
+    .container {
+        padding: 18px;
+    }
+
+    .navbar {
+        padding: 18px;
+    }
+
+    .form-row {
+        flex-direction: column;
+    }
+
+    .intel-row,
+    .path-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

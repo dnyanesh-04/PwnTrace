@@ -1,0 +1,9 @@
+Flask>=3.1,<4
+python-nmap>=0.7.1
+nvdlib>=0.7.7
+networkx>=3.2
+matplotlib>=3.8
+reportlab>=4.0
+python-dotenv>=1.0
+plotly>=5.20
+pandas>=2.0

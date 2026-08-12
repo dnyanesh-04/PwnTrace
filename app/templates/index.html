@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PwnTrace — Vulnerability & Attack-Path Mapper</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+</head>
+
+<body>
+<header class="navbar">
+    <div class="logo">PwnTrace</div>
+    <div class="subtitle">Automated Vulnerability & Attack-Path Mapper</div>
+</header>
+
+<main class="container">
+    <section class="hero">
+        <h1>Security Assessment & Attack-Path Analysis</h1>
+        <p>
+            Nmap service discovery → NVD/CVE correlation → CVSS prioritization →
+            exploit intelligence → heuristic MITRE ATT&CK mapping → potential
+            attack-path analysis.
+        </p>
+        <p class="notice">
+            Use only against systems you are authorized to assess.
+            PwnTrace does not execute exploits.
+        </p>
+    </section>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <section class="scan-box">
+        <form method="POST" id="scan-form">
+            <label for="target">Authorized target</label>
+            <div class="form-row">
+                <input
+                    id="target"
+                    type="text"
+                    name="target"
+                    placeholder="192.168.1.10 or example.local"
+                    required
+                >
+                <button id="scan-button" type="submit">Start Assessment</button>
+            </div>
+        </form>
+
+        <div class="progress-container hidden" id="progress-container">
+            <div class="progress-bar" id="progress-bar">
+                Analysis running…
+            </div>
+        </div>
+    </section>
+
+    {% if data %}
+    <section class="summary-grid">
+        <div class="metric"><span>Hosts</span><strong>{{ data.summary.hosts }}</strong></div>
+        <div class="metric"><span>Services</span><strong>{{ data.summary.services }}</strong></div>
+        <div class="metric"><span>CVEs</span><strong>{{ data.summary.cves }}</strong></div>
+        <div class="metric"><span>Critical</span><strong>{{ data.summary.critical }}</strong></div>
+        <div class="metric"><span>High</span><strong>{{ data.summary.high }}</strong></div>
+        <div class="metric"><span>CISA KEV</span><strong>{{ data.summary.kev }}</strong></div>
+        <div class="metric"><span>Potential Paths</span><strong>{{ data.summary.paths }}</strong></div>
+    </section>
+
+    <section class="card">
+        <h2>Reconnaissance</h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>Host</th><th>Port</th><th>Service</th>
+                    <th>Product</th><th>Version</th><th>State</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in data.scan_results %}
+                <tr>
+                    <td>{{ item.host }}</td>
+                    <td>{{ item.port }}/{{ item.protocol }}</td>
+                    <td>{{ item.service }}</td>
+                    <td>{{ item.product or "—" }}</td>
+                    <td>{{ item.version or "—" }}</td>
+                    <td>{{ item.state or "—" }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6">No open services were discovered.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="card">
+        <h2>Vulnerability Correlation & Prioritization</h2>
+        <p class="muted">
+            CVSS is shown separately from PwnTrace's contextual priority score.
+            A CVE match is a correlation, not proof that the installed service is vulnerable.
+        </p>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>CVE</th><th>Service</th><th>CVSS</th>
+                    <th>Severity</th><th>Priority</th><th>KEV</th>
+                    <th>Match</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for cve in data.cves %}
+                <tr>
+                    <td><a href="{{ cve.nvd_url }}" target="_blank" rel="noopener">{{ cve.id }}</a></td>
+                    <td>{{ cve.service }}:{{ cve.port }}</td>
+                    <td>{{ cve.cvss if cve.cvss is not none else "N/A" }}</td>
+                    <td><span class="severity {{ cve.severity|lower }}">{{ cve.severity }}</span></td>
+                    <td><strong>{{ cve.priority_score }}</strong></td>
+                    <td>{{ "Yes" if cve.kev else "No" }}</td>
+                    <td title="{{ cve.match_reason }}">{{ cve.match_score }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7">No CVE correlations were returned.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="card">
+        <h2>Exploit Intelligence</h2>
+        {% for item in data.exploits %}
+            <div class="intel-row">
+                <strong>{{ item.cve }}</strong>
+                <span>{{ item.status }}</span>
+                <a href="{{ item.exploitdb_url }}" target="_blank" rel="noopener">Exploit-DB search</a>
+            </div>
+        {% else %}
+            <p class="muted">No exploit-intelligence records were generated.</p>
+        {% endfor %}
+    </section>
+
+    <section class="card">
+        <h2>MITRE ATT&CK Hypotheses</h2>
+        <p class="muted">
+            These mappings are heuristic, evidence-based hypotheses derived from
+            NVD/CVSS/service data; they are not presented as official MITRE CVE mappings.
+        </p>
+
+        {% for mapping in data.mitre %}
+            {% if mapping.techniques %}
+                <div class="mapping">
+                    <h3>{{ mapping.cve }} — {{ mapping.service }}:{{ mapping.port }}</h3>
+                    {% for technique in mapping.techniques %}
+                        <div class="technique">
+                            <strong>{{ technique.id }} — {{ technique.name }}</strong>
+                            <span>{{ technique.tactic }} · {{ technique.confidence }} confidence</span>
+                            <small>{{ technique.evidence }}</small>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% else %}
+            <p class="muted">No ATT&CK hypotheses were generated.</p>
+        {% endfor %}
+    </section>
+
+    <section class="card">
+        <h2>Potential Attack Paths</h2>
+        <p class="muted">
+            A path represents analytical reasoning from observed evidence. It is
+            not a proof of exploitability, compromise, privilege escalation, or lateral movement.
+        </p>
+
+        {% for path in data.attack_paths.paths %}
+            <div class="path">
+                <div class="path-header">
+                    <h3>{{ path.path_id }} — {{ path.label }}</h3>
+                    <span>Score {{ path.score }} · {{ path.confidence }}</span>
+                </div>
+
+                <ol>
+                    {% for step in path.steps %}
+                    <li>
+                        <strong>{{ step.phase }}</strong> —
+                        {{ step.cve }} —
+                        {{ step.technique_id }} {{ step.technique }}
+                        <small>{{ step.evidence }} · {{ step.confidence }} confidence</small>
+                    </li>
+                    {% endfor %}
+                </ol>
+
+                <div class="assumptions">
+                    {% for assumption in path.assumptions %}
+                        <div>• {{ assumption }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% else %}
+            <p class="muted">No potential attack path could be generated from the available evidence.</p>
+        {% endfor %}
+    </section>
+
+    <section class="card">
+        <h2>Evidence Graph</h2>
+        <div class="graph">
+            {{ graph_html|safe }}
+        </div>
+    </section>
+
+    <section class="exports">
+        <a href="{{ url_for('main.download_pdf') }}">Download PDF</a>
+        <a href="{{ url_for('main.download_json') }}">Export JSON</a>
+        <a href="{{ url_for('main.download_csv') }}">Export CSV</a>
+    </section>
+    {% endif %}
+</main>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

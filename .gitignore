@@ -1,0 +1,9 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+reports/*.pdf
+reports/*.png
+app/static/exports/*.json
+app/static/exports/*.csv
