@@ -48,9 +48,3 @@ How closely generated attack paths match manually created paths
 Time taken compared with doing the analysis manually
 
 These metrics should only be reported after actually testing and measuring them.
-
-## Screenshots
-
-### PwnTrace Dashboard
-<img width="1920" height="83<img width="1920" height="834" alt="Screenshot (1356)" src="https://github.com/user-attachments/assets/fe7a1ab4-0107-40fd-9a4b-e6548e56d4ee" />
-4" alt="Screenshot (1356)" src="https://github.com/user-attachments/assets/426b0684-e81a-4aff-a73e-e0f55b642503" />
